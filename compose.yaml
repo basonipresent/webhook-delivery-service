@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        MAIN_PKG: ${MAIN_PKG:-.}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      PORT: "8080"
+      # DATABASE_URL: postgres://app:app@db:5432/app?sslmode=disable
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+
+  # Fallback race-test runner: full Debian Go image with gcc, which -race needs.
+  # Not started by `up`; used by `make docker-test-race`.
+  test:
+    image: golang:1.26
+    profiles: ["test"]
+    working_dir: /src
+    environment:
+      CGO_ENABLED: "1"
+    volumes:
+      - .:/src
+      - gomod:/go/pkg/mod
+      - gocache:/root/.cache/go-build
+
+  # Uncomment if you switch to PostgreSQL.
+  # db:
+  #   image: postgres:16
+  #   environment:
+  #     POSTGRES_USER: app
+  #     POSTGRES_PASSWORD: app
+  #     POSTGRES_DB: app
+  #   ports:
+  #     - "5432:5432"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U app"]
+  #     interval: 2s
+  #     retries: 15
+
+volumes:
+  gomod:
+  gocache:

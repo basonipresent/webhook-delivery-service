@@ -1,0 +1,9 @@
+.git
+.claude
+spec
+scripts
+*.exe
+*.test
+*.out
+bin/
+dist/
